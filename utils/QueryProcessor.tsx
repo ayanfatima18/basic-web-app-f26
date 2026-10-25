@@ -43,4 +43,42 @@ export default function QueryProcessor(query: string): string {
   }
 
   return "";
+  
+  // Addition: supports 2, 3, or more numbers
+  const additionMatch = query.trim().match(
+    /^what is\s+(-?\d+(?:\s+plus\s+-?\d+)+)\s*\??$/i
+  );
+
+  if (additionMatch) {
+    const numbers = additionMatch[1]
+      .split(/\s+plus\s+/i)
+      .map(Number);
+
+    return String(numbers.reduce((sum, n) => sum + n, 0));
+  }
+
+  // Prime number questions
+  const primeMatch = query.trim().match(
+    /^which of the following numbers are primes:\s*([-\d,\s]+)\??$/i
+  );
+
+  if (primeMatch) {
+    const numbers = primeMatch[1]
+      .split(",")
+      .map(n => Number(n.trim()));
+
+    const isPrime = (n: number): boolean => {
+      if (!Number.isInteger(n) || n < 2) return false;
+
+      for (let i = 2; i * i <= n; i++) {
+        if (n % i === 0) return false;
+      }
+
+      return true;
+    };
+
+    return numbers.filter(isPrime).join(", ");
+  }
+
 }
+
