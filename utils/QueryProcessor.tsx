@@ -20,7 +20,6 @@ export default function QueryProcessor(query: string): string {
   }
 /* -------- */
 
-
   // Addition questions
   const additionMatch = query.match(
     /what is\s+(-?\d+)\s+plus\s+(-?\d+)\s*\??\s*$/i
@@ -42,43 +41,31 @@ export default function QueryProcessor(query: string): string {
     return String(Math.max(...numbers));
   }
 
-  return "";
   
-  // Addition: supports 2, 3, or more numbers
-  const additionMatch = query.trim().match(
-    /^what is\s+(-?\d+(?:\s+plus\s+-?\d+)+)\s*\??$/i
+  // Multiplication with addition (BODMAS/PEMDAS)
+  const mixedMatch = query.trim().match(
+    /^what is\s+(-?\d+)\s+plus\s+(-?\d+)\s+multiplied by\s+(-?\d+)\s*\??$/i
   );
 
-  if (additionMatch) {
-    const numbers = additionMatch[1]
-      .split(/\s+plus\s+/i)
-      .map(Number);
+  if (mixedMatch) {
+    const a = BigInt(mixedMatch[1]);
+    const b = BigInt(mixedMatch[2]);
+    const c = BigInt(mixedMatch[3]);
 
-    return String(numbers.reduce((sum, n) => sum + n, 0));
+    return (a + b * c).toString();
   }
 
-  // Prime number questions
-  const primeMatch = query.trim().match(
-    /^which of the following numbers are primes:\s*([-\d,\s]+)\??$/i
+  // Exponentiation: exact large integer calculations
+  const powerMatch = query.trim().match(
+    /^what is\s+(-?\d+)\s+to the power of\s+(\d+)\s*\??$/i
   );
 
-  if (primeMatch) {
-    const numbers = primeMatch[1]
-      .split(",")
-      .map(n => Number(n.trim()));
+  if (powerMatch) {
+    const base = BigInt(powerMatch[1]);
+    const exponent = BigInt(powerMatch[2]);
 
-    const isPrime = (n: number): boolean => {
-      if (!Number.isInteger(n) || n < 2) return false;
-
-      for (let i = 2; i * i <= n; i++) {
-        if (n % i === 0) return false;
-      }
-
-      return true;
-    };
-
-    return numbers.filter(isPrime).join(", ");
+    return (base ** exponent).toString();
   }
 
+  return "";
 }
-
