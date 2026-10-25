@@ -20,16 +20,26 @@ export default function QueryProcessor(query: string): string {
   }
 /* -------- */
 
-  if (query.toLowerCase().includes("largest")) {
-    return "61";
+
+  // Addition questions
+  const additionMatch = query.match(
+    /what is\s+(-?\d+)\s+plus\s+(-?\d+)\s*\??\s*$/i
+  );
+
+  if (additionMatch) {
+    const num1 = Number(additionMatch[1]);
+    const num2 = Number(additionMatch[2]);
+    return String(num1 + num2);
   }
 
-  if (query.toLowerCase().includes("23")) {
-    return "29";
-  }
+  // Largest number questions
+  const largestMatch = query.match(
+    /which of the following numbers is the largest:\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\??\s*$/i
+  );
 
-  if (query.toLowerCase().includes("92")) {
-    return "188";
+  if (largestMatch) {
+    const numbers = largestMatch.slice(1).map(Number);
+    return String(Math.max(...numbers));
   }
 
   return "";
